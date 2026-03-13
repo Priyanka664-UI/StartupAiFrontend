@@ -103,15 +103,15 @@ import { RouterModule } from '@angular/router';
   styles: [`
     .landing-container {
       min-height: 100vh;
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      color: white;
+      background: #f8fafc;
+      color: #1e293b;
     }
     
     .navbar {
       padding: 1.5rem 0;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .container {
@@ -129,6 +129,7 @@ import { RouterModule } from '@angular/router';
       gap: 0.75rem;
       font-weight: 700;
       font-size: 1.5rem;
+      color: #1e293b;
     }
     
     .logo-icon {
@@ -142,12 +143,12 @@ import { RouterModule } from '@angular/router';
     }
     
     .nav-links a {
-      opacity: 0.9;
-      transition: opacity 0.3s;
+      color: #64748b;
+      transition: color 0.3s;
     }
     
     .nav-links a:hover {
-      opacity: 1;
+      color: #6366f1;
     }
     
     .nav-cta {
@@ -158,27 +159,27 @@ import { RouterModule } from '@angular/router';
     
     .nav-login {
       font-weight: 500;
-      opacity: 0.9;
-      transition: opacity 0.3s;
+      color: #64748b;
+      transition: color 0.3s;
     }
     
     .nav-login:hover {
-      opacity: 1;
+      color: #6366f1;
     }
     
     .btn-primary {
-      background: rgba(255, 255, 255, 0.2);
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       color: white;
       padding: 0.75rem 1.5rem;
       border-radius: 12px;
       font-weight: 600;
       transition: all 0.3s ease;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: none;
     }
     
     .btn-primary:hover {
-      background: rgba(255, 255, 255, 0.3);
       transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
     }
     
     .hero-section {
@@ -197,30 +198,31 @@ import { RouterModule } from '@angular/router';
       font-weight: 800;
       line-height: 1.1;
       margin-bottom: 1.5rem;
+      color: #1e293b;
     }
     
     .hero-subtitle {
       font-size: 1.3rem;
-      opacity: 0.9;
+      color: #64748b;
       margin-bottom: 2.5rem;
       line-height: 1.6;
     }
     
     .btn-generate {
-      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       color: white;
       padding: 1.2rem 2.5rem;
       border-radius: 16px;
       font-weight: 700;
       font-size: 1.1rem;
       transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
       display: inline-block;
     }
     
     .btn-generate:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(245, 158, 11, 0.6);
+      box-shadow: 0 12px 35px rgba(99, 102, 241, 0.6);
     }
     
     .hero-visual {
@@ -245,14 +247,14 @@ import { RouterModule } from '@angular/router';
       position: absolute;
       width: 80px;
       height: 80px;
-      background: rgba(255, 255, 255, 0.2);
+      background: white;
       border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2rem;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
       animation: float 3s ease-in-out infinite;
     }
     
@@ -269,7 +271,7 @@ import { RouterModule } from '@angular/router';
     
     .features-section {
       padding: 4rem 0;
-      background: rgba(255, 255, 255, 0.05);
+      background: white;
     }
     
     .features-grid {
@@ -279,18 +281,18 @@ import { RouterModule } from '@angular/router';
     }
     
     .feature-card {
-      background: rgba(255, 255, 255, 0.1);
+      background: white;
       padding: 2rem 1.5rem;
       border-radius: 16px;
       text-align: center;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
       transition: all 0.3s ease;
     }
     
     .feature-card:hover {
       transform: translateY(-5px);
-      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     }
     
     .feature-icon {
@@ -302,11 +304,12 @@ import { RouterModule } from '@angular/router';
       font-size: 1.1rem;
       font-weight: 700;
       margin-bottom: 0.75rem;
+      color: #1e293b;
     }
     
     .feature-card p {
       font-size: 0.9rem;
-      opacity: 0.9;
+      color: #64748b;
       line-height: 1.5;
     }
     
@@ -317,7 +320,7 @@ import { RouterModule } from '@angular/router';
     
     .trusted-text {
       font-size: 0.9rem;
-      opacity: 0.7;
+      color: #64748b;
       margin-bottom: 2rem;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -333,12 +336,12 @@ import { RouterModule } from '@angular/router';
     .company-logo {
       font-size: 1.2rem;
       font-weight: 600;
-      opacity: 0.6;
-      transition: opacity 0.3s;
+      color: #64748b;
+      transition: color 0.3s;
     }
     
     .company-logo:hover {
-      opacity: 0.9;
+      color: #6366f1;
     }
     
     @media (max-width: 768px) {
