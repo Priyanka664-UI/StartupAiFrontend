@@ -1,0 +1,122 @@
+<div class="dashboard-container">
+  <nav class="dashboard-nav">
+    <div class="nav-brand">
+      <div class="logo-icon">🚀</div>
+      <span>StartSmart AI</span>
+    </div>
+    <div class="nav-menu">
+      <button (click)="showDashboard()" [class.active]="currentView === 'dashboard'" class="nav-btn">
+        🏠 Dashboard
+      </button>
+      <button (click)="generateIdea()" [class.active]="currentView === 'generate'" class="nav-btn">
+        💡 Generate Idea
+      </button>
+      <button (click)="showTrends()" [class.active]="currentView === 'trends'" class="nav-btn">
+        📈 Market Trends
+      </button>
+      <button (click)="showMentor()" [class.active]="currentView === 'mentor'" class="nav-btn">
+        🤖 AI Mentor Chat
+      </button>
+      <button (click)="showSettings()" [class.active]="currentView === 'settings'" class="nav-btn">
+        ⚙️ Settings
+      </button>
+    </div>
+    <div class="nav-user">
+      <span *ngIf="user">Hello, {{user.name}}!</span>
+      <button (click)="logout()" class="btn-logout">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Dashboard View -->
+  <main *ngIf="currentView === 'dashboard'" class="dashboard-main">
+    <div class="dashboard-header">
+      <h1>Your Startup Dashboard</h1>
+      <button (click)="generateIdea()" [disabled]="loading" class="btn-generate">
+        {{loading ? 'Generating...' : 'Generate New Idea'}} ✨
+      </button>
+    </div>
+
+    <div class="dashboard-content">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">{{ideas.length}}</div>
+          <div class="stat-label">Ideas Generated</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{highPotentialIdeas}}</div>
+          <div class="stat-label">High Potential</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{analyzedIdeas}}</div>
+          <div class="stat-label">Analyzed</div>
+        </div>
+      </div>
+
+      <div class="ideas-section">
+        <h2>Your Startup Ideas</h2>
+        <div *ngIf="ideas.length === 0" class="empty-state">
+          <div class="empty-icon">💡</div>
+          <p>No ideas yet. Generate your first startup idea!</p>
+        </div>
+        
+        <div class="ideas-grid">
+          <div *ngFor="let idea of ideas" class="idea-card">
+            <div class="idea-header">
+              <h3>{{idea.title}}</h3>
+              <div class="opportunity-score" [class.high]="idea.opportunityScore > 7">
+                {{idea.opportunityScore}}/10
+              </div>
+            </div>
+            <p class="idea-description">{{idea.description}}</p>
+            <div class="idea-tags">
+              <span *ngFor="let tag of idea.tags" class="tag">{{tag}}</span>
+            </div>
+            <div class="idea-actions">
+              <button (click)="viewIdeaDetails(idea)" class="btn-secondary">View Details</button>
+              <button (click)="analyzeMarket(idea)" class="btn-primary">Analyze Market</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Idea Generator View -->
+  <main *ngIf="currentView === 'generate'" class="dashboard-main">
+    <div class="generator-content">
+      <h1>🎯 AI Idea Generator</h1>
+      <p>Generate personalized startup ideas based on your profile</p>
+      <div class="generator-card">
+        <button (click)="quickGenerateIdea()" [disabled]="loading" class="quick-generate-btn">
+          <span *ngIf="!loading">Generate Quick Idea ✨</span>
+          <span *ngIf="loading">Generating... 🔄</span>
+        </button>
+        <p class="generator-note">Click to generate a startup idea instantly!</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Market Trends View -->
+  <main *ngIf="currentView === 'trends'" class="dashboard-main">
+    <div class="trends-content">
+      <h1>📈 Market Trends</h1>
+      <p>Coming soon! This will show current market trends and opportunities.</p>
+    </div>
+  </main>
+
+  <!-- AI Mentor View -->
+  <main *ngIf="currentView === 'mentor'" class="dashboard-main">
+    <div class="mentor-content">
+      <h1>🤖 AI Mentor Chat</h1>
+      <p>Coming soon! Chat with our AI mentor for personalized startup advice.</p>
+    </div>
+  </main>
+
+  <!-- Settings View -->
+  <main *ngIf="currentView === 'settings'" class="dashboard-main">
+    <div class="settings-content">
+      <h1>⚙️ Settings</h1>
+      <p>Coming soon! Manage your account settings and preferences.</p>
+    </div>
+  </main>
+</div>
