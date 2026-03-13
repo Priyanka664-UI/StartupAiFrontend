@@ -6,6 +6,7 @@ import { LandingComponent } from './components/landing/landing.component';
 import { SolutionsComponent } from './components/solutions/solutions.component';
 import { FeaturesComponent } from './components/features/features.component';
 import { ContactComponent } from './components/contact/contact.component';
+import { MarketTrendsComponent } from './components/market-trends/market-trends.component';
 import { AuthGuard } from './services/auth.guard';
 
 export const routes: Routes = [
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'market-trends', component: MarketTrendsComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/' }
 ];

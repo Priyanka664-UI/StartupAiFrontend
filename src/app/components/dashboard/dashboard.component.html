@@ -14,6 +14,9 @@
       <button (click)="showTrends()" [class.active]="currentView === 'trends'" class="nav-btn">
         📈 Market Trends
       </button>
+      <button (click)="testMarketAnalysis()" [class.active]="currentView === 'market-analysis'" class="nav-btn">
+        📊 Market Analysis
+      </button>
       <button (click)="showMentor()" [class.active]="currentView === 'mentor'" class="nav-btn">
         🤖 AI Mentor Chat
       </button>
@@ -98,10 +101,7 @@
 
   <!-- Market Trends View -->
   <main *ngIf="currentView === 'trends'" class="dashboard-main">
-    <div class="trends-content">
-      <h1>📈 Market Trends</h1>
-      <p>Coming soon! This will show current market trends and opportunities.</p>
-    </div>
+    <app-market-trends></app-market-trends>
   </main>
 
   <!-- AI Mentor View -->
@@ -110,6 +110,14 @@
       <h1>🤖 AI Mentor Chat</h1>
       <p>Coming soon! Chat with our AI mentor for personalized startup advice.</p>
     </div>
+  </main>
+
+  <!-- Market Analysis View -->
+  <main *ngIf="currentView === 'market-analysis'" class="dashboard-main">
+    <div class="analysis-header">
+      <button (click)="backToDashboard()" class="btn-back">← Back to Dashboard</button>
+    </div>
+    <app-market-analysis [idea]="selectedIdeaForAnalysis"></app-market-analysis>
   </main>
 
   <!-- Settings View -->

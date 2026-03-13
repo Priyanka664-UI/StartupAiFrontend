@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { StartupService } from '../../services/startup.service';
+import { MarketTrendsComponent } from '../market-trends/market-trends.component';
+import { MarketAnalysisComponent } from '../market-analysis/market-analysis.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MarketTrendsComponent, MarketAnalysisComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -41,6 +43,7 @@ export class DashboardComponent implements OnInit {
   ];
   loading = false;
   currentView = 'dashboard';
+  selectedIdeaForAnalysis: any = null;
 
   constructor(
     private authService: AuthService,
@@ -117,12 +120,33 @@ export class DashboardComponent implements OnInit {
     this.currentView = 'settings';
   }
 
+  testMarketAnalysis() {
+    // Create a test idea for market analysis
+    const testIdea = {
+      id: 999,
+      title: 'AI-Powered Market Analysis Tool',
+      description: 'A comprehensive market analysis platform for startups',
+      opportunityScore: 8.5,
+      tags: ['AI', 'Analytics', 'SaaS'],
+      marketAnalysis: false
+    };
+    this.analyzeMarket(testIdea);
+  }
+
   viewIdeaDetails(idea: any) {
     console.log('Viewing details for:', idea.title);
   }
 
   analyzeMarket(idea: any) {
-    console.log('Analyzing market for:', idea.title);
+    console.log('Analyzing market for idea:', idea);
+    this.selectedIdeaForAnalysis = idea;
+    this.currentView = 'market-analysis';
+  }
+
+  backToDashboard() {
+    console.log('Returning to dashboard');
+    this.currentView = 'dashboard';
+    this.selectedIdeaForAnalysis = null;
   }
 
   logout() {

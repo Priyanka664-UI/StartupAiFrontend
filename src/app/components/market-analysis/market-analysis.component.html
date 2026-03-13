@@ -1,0 +1,306 @@
+<div class="market-analysis-container">
+  <div class="analysis-header">
+    <h2>📊 Market Analysis: {{idea?.title || 'Sample Analysis'}}</h2>
+    <div class="analysis-tabs">
+      <button 
+        (click)="setActiveTab('market')" 
+        [class.active]="activeTab === 'market'"
+        class="tab-btn">
+        🎯 Market Overview
+      </button>
+      <button 
+        (click)="setActiveTab('competitors')" 
+        [class.active]="activeTab === 'competitors'"
+        class="tab-btn">
+        🏢 Competitors
+      </button>
+      <button 
+        (click)="setActiveTab('trends')" 
+        [class.active]="activeTab === 'trends'"
+        class="tab-btn">
+        📈 Trends
+      </button>
+      <button 
+        (click)="setActiveTab('tech')" 
+        [class.active]="activeTab === 'tech'"
+        class="tab-btn">
+        💻 Tech Stack
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Fetching real-time market data from APIs...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Unable to Load Market Data</h3>
+    <p>{{error}}</p>
+    <button (click)="retryLoad()" class="retry-btn">Retry Loading</button>
+  </div>
+
+  <!-- Market Overview Tab -->
+  <div *ngIf="activeTab === 'market' && !loading && !error" class="tab-content">
+    <div *ngIf="marketData" class="market-overview">
+      <div class="market-stats">
+        <div class="stat-card" *ngIf="marketData.marketSize">
+          <div class="stat-value">{{marketData.marketSize}}</div>
+          <div class="stat-label">Market Size</div>
+        </div>
+        <div class="stat-card" *ngIf="marketData.growthRate">
+          <div class="stat-value">{{marketData.growthRate}}</div>
+          <div class="stat-label">Annual Growth</div>
+        </div>
+      </div>
+
+      <div *ngIf="marketData.marketSegments" class="market-segments">
+        <h3>Market Segments</h3>
+        <div class="segments-grid">
+          <div *ngFor="let segment of marketData.marketSegments" class="segment-card">
+            <h4>{{segment.name}}</h4>
+            <div class="segment-size">{{segment.size}} of market</div>
+            <div class="segment-growth">{{segment.growth}} growth</div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="marketData.keyInsights" class="key-insights">
+        <h3>Key Market Insights</h3>
+        <ul class="insights-list">
+          <li *ngFor="let insight of marketData.keyInsights">{{insight}}</li>
+        </ul>
+      </div>
+
+      <div *ngIf="marketData.targetAudience" class="target-audience">
+        <h3>Target Audience</h3>
+        <p>{{marketData.targetAudience}}</p>
+      </div>
+
+      <!-- Recent News Section -->
+      <div *ngIf="marketData.recentNews && marketData.recentNews.length > 0" class="recent-news">
+        <h3>Recent Market News</h3>
+        <div class="news-grid">
+          <div *ngFor="let news of marketData.recentNews" class="news-card">
+            <h4>{{news.title}}</h4>
+            <p>{{news.summary || news.description}}</p>
+            <div class="news-meta">
+              <span class="news-source">{{news.source}}</span>
+              <span class="news-date">{{formatDate(news.publishedDate)}}</span>
+            </div>
+            <a [href]="news.url" target="_blank" class="news-link">Read More →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!marketData" class="no-data">
+      <p>No market data available from API</p>
+    </div>
+  </div>
+
+  <!-- Competitors Tab -->
+  <div *ngIf="activeTab === 'competitors' && !loading && !error" class="tab-content">
+    <div *ngIf="competitorData" class="competitors-analysis">
+      <!-- Competition Overview -->
+      <div class="competition-overview">
+        <div class="overview-card" *ngIf="competitorData.competitionLevel">
+          <h4>Competition Level</h4>
+          <p>{{competitorData.competitionLevel}}</p>
+        </div>
+        <div class="overview-card" *ngIf="competitorData.marketGaps">
+          <h4>Market Gaps</h4>
+          <p>{{competitorData.marketGaps}}</p>
+        </div>
+      </div>
+
+      <!-- Funding Trends -->
+      <div *ngIf="competitorData.fundingTrends" class="funding-trends">
+        <h3>Funding Landscape</h3>
+        <div class="funding-stats">
+          <div class="funding-stat" *ngIf="competitorData.fundingTrends.fundedCompanies">
+            <span class="stat-number">{{competitorData.fundingTrends.fundedCompanies}}</span>
+            <span class="stat-label">Funded Companies</span>
+          </div>
+          <div class="funding-stat" *ngIf="competitorData.fundingTrends.averageFundingStage">
+            <span class="stat-text">{{competitorData.fundingTrends.averageFundingStage}}</span>
+            <span class="stat-label">Average Stage</span>
+          </div>
+        </div>
+        <div class="hot-sectors" *ngIf="competitorData.fundingTrends.hotSectors">
+          <h4>Hot Sectors</h4>
+          <div class="sector-tags">
+            <span *ngFor="let sector of competitorData.fundingTrends.hotSectors" class="sector-tag">{{sector}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="competitorData.directCompetitors && competitorData.directCompetitors.length > 0" class="direct-competitors">
+        <h3>Direct Competitors</h3>
+        <div class="competitors-grid">
+          <div *ngFor="let competitor of competitorData.directCompetitors" class="competitor-card">
+            <div class="competitor-header">
+              <h4>{{competitor.startupName || competitor.name}}</h4>
+              <div class="competitor-badges">
+                <span class="funding-badge" *ngIf="competitor.fundingStage">{{competitor.fundingStage}}</span>
+                <span *ngIf="competitor.marketShare" class="market-share">{{competitor.marketShare}}</span>
+              </div>
+            </div>
+            <p class="competitor-description" *ngIf="competitor.description">{{competitor.description}}</p>
+            <div *ngIf="competitor.strengths || competitor.weaknesses" class="competitor-details">
+              <div class="strengths" *ngIf="competitor.strengths">
+                <h5>Strengths</h5>
+                <ul>
+                  <li *ngFor="let strength of competitor.strengths">{{strength}}</li>
+                </ul>
+              </div>
+              <div *ngIf="competitor.weaknesses" class="weaknesses">
+                <h5>Weaknesses</h5>
+                <ul>
+                  <li *ngFor="let weakness of competitor.weaknesses">{{weakness}}</li>
+                </ul>
+              </div>
+            </div>
+            <a *ngIf="competitor.websiteUrl" [href]="competitor.websiteUrl" target="_blank" class="competitor-link">
+              Visit Website →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!competitorData" class="no-data">
+      <p>No competitor data available from API</p>
+    </div>
+  </div>
+
+  <!-- Trends Tab -->
+  <div *ngIf="activeTab === 'trends' && !loading && !error" class="tab-content">
+    <div *ngIf="trendsData" class="trends-analysis">
+      <div class="trend-score" *ngIf="trendsData.growthScore">
+        <h3>Overall Trend Score</h3>
+        <div class="score-display">
+          <span class="score-number">{{trendsData.growthScore}}</span>
+          <span class="score-label">/10</span>
+        </div>
+      </div>
+
+      <div *ngIf="trendsData.emergingTrends && trendsData.emergingTrends.length > 0" class="trends-section">
+        <h3>🚀 Emerging Trends</h3>
+        <div class="trends-grid">
+          <div *ngFor="let trend of trendsData.emergingTrends" class="trend-item">
+            {{trend}}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="trendsData.marketDrivers && trendsData.marketDrivers.length > 0" class="trends-section">
+        <h3>📊 Market Drivers</h3>
+        <div class="trends-grid">
+          <div *ngFor="let driver of trendsData.marketDrivers" class="trend-item driver">
+            {{driver}}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="trendsData.challenges && trendsData.challenges.length > 0" class="trends-section">
+        <h3>⚠️ Challenges</h3>
+        <div class="trends-grid">
+          <div *ngFor="let challenge of trendsData.challenges" class="trend-item challenge">
+            {{challenge}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Trending Technologies -->
+      <div *ngIf="trendsData.trendingTechnologies && trendsData.trendingTechnologies.length > 0" class="trending-tech">
+        <h3>🔥 Trending Technologies</h3>
+        <div class="tech-grid">
+          <div *ngFor="let tech of trendsData.trendingTechnologies" class="tech-card">
+            <div class="tech-header">
+              <h4>{{tech.technologyName || tech.name}}</h4>
+              <span class="tech-language" *ngIf="tech.programmingLanguage || tech.language">{{tech.programmingLanguage || tech.language}}</span>
+            </div>
+            <p *ngIf="tech.description">{{tech.description}}</p>
+            <div class="tech-stats">
+              <span class="tech-stars" *ngIf="tech.stars">⭐ {{formatStars(tech.stars)}}</span>
+              <a *ngIf="tech.repositoryUrl" [href]="tech.repositoryUrl" target="_blank" class="tech-link">View →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!trendsData" class="no-data">
+      <p>No trends data available from API</p>
+    </div>
+  </div>
+
+  <!-- Tech Stack Tab -->
+  <div *ngIf="activeTab === 'tech' && !loading && !error" class="tab-content">
+    <div *ngIf="techStackData" class="tech-stack-analysis">
+      <h3>Recommended Technology Stack</h3>
+      
+      <div *ngIf="techStackData.recommended" class="tech-categories">
+        <div class="tech-category" *ngIf="techStackData.recommended.frontend">
+          <h4>Frontend</h4>
+          <div class="tech-tags">
+            <span *ngFor="let tech of techStackData.recommended.frontend" class="tech-tag">{{tech}}</span>
+          </div>
+        </div>
+
+        <div class="tech-category" *ngIf="techStackData.recommended.backend">
+          <h4>Backend</h4>
+          <div class="tech-tags">
+            <span *ngFor="let tech of techStackData.recommended.backend" class="tech-tag">{{tech}}</span>
+          </div>
+        </div>
+
+        <div class="tech-category" *ngIf="techStackData.recommended.database">
+          <h4>Database</h4>
+          <div class="tech-tags">
+            <span *ngFor="let tech of techStackData.recommended.database" class="tech-tag">{{tech}}</span>
+          </div>
+        </div>
+
+        <div class="tech-category" *ngIf="techStackData.recommended.cloud">
+          <h4>Cloud Platform</h4>
+          <div class="tech-tags">
+            <span *ngFor="let tech of techStackData.recommended.cloud" class="tech-tag">{{tech}}</span>
+          </div>
+        </div>
+
+        <div class="tech-category" *ngIf="techStackData.recommended.ai">
+          <h4>AI/ML</h4>
+          <div class="tech-tags">
+            <span *ngFor="let tech of techStackData.recommended.ai" class="tech-tag">{{tech}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="techStackData.reasoning" class="tech-reasoning">
+        <h4>Why These Technologies?</h4>
+        <div class="reasoning-list">
+          <div *ngFor="let item of techStackData.reasoning | keyvalue" class="reasoning-item">
+            <strong>{{item.key}}:</strong> {{item.value}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Trending Frameworks -->
+      <div *ngIf="techStackData.trendingFrameworks && techStackData.trendingFrameworks.length > 0" class="trending-frameworks">
+        <h4>Currently Trending Frameworks</h4>
+        <div class="framework-tags">
+          <span *ngFor="let framework of techStackData.trendingFrameworks" class="framework-tag">{{framework}}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!techStackData" class="no-data">
+      <p>No tech stack data available from API</p>
+    </div>
+  </div>
+</div>

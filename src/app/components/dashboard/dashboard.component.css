@@ -417,3 +417,23 @@
     flex-direction: column;
   }
 }
+.btn-back {
+  background: #6b7280 !important;
+  color: white !important;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.btn-back:hover {
+  background: #4b5563 !important;
+  transform: translateY(-1px);
+}
+
+.analysis-header {
+  margin-bottom: 1rem;
+}
