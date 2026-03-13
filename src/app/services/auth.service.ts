@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = 'http://localhost:8087/api/auth';
   private tokenSubject = new BehaviorSubject<string | null>(localStorage.getItem('token'));
   
   constructor(private http: HttpClient) {}
@@ -24,7 +24,39 @@ export class AuthService {
   }
 
   register(userData: { name: string; email: string; password: string }): Observable<any> {
+    console.log('AuthService: Sending registration request:', userData);
     return this.http.post(`${this.apiUrl}/register`, userData);
+  }
+
+  googleLogin(idToken: string): Observable<any> {
+    console.log('AuthService: Sending Google login request with token:', idToken.substring(0, 50) + '...');
+    const payload = { idToken };
+    console.log('AuthService: Request payload:', payload);
+    
+    return this.http.post(`${this.apiUrl}/google`, payload).pipe(
+      tap((response: any) => {
+        console.log('AuthService: Google login response:', response);
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          this.tokenSubject.next(response.token);
+        }
+      })
+    );
+  }
+
+  googleRegister(email: string, name: string, googleId: string): Observable<any> {
+    console.log('AuthService: Sending Google registration request for:', email);
+    const payload = { email, name, googleId };
+    
+    return this.http.post(`${this.apiUrl}/google/register`, payload).pipe(
+      tap((response: any) => {
+        console.log('AuthService: Google registration response:', response);
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          this.tokenSubject.next(response.token);
+        }
+      })
+    );
   }
 
   getUserProfile(): Observable<any> {

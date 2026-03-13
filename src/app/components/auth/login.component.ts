@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { GoogleSigninComponent } from './google-signin.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, GoogleSigninComponent],
   template: `
     <div class="auth-container">
       <div class="auth-card">
@@ -50,6 +51,12 @@ import { AuthService } from '../../services/auth.service';
             <a href="#">Forgot Password?</a>
           </div>
         </form>
+        
+        <div class="divider">
+          <span>or</span>
+        </div>
+        
+        <app-google-signin></app-google-signin>
         
         <div class="auth-footer">
           <p>Don't have an account? <a routerLink="/register" class="signup-link">Sign up</a></p>
@@ -205,6 +212,29 @@ import { AuthService } from '../../services/auth.service';
       font-size: 0.9rem;
       text-align: center;
     }
+    
+    .divider {
+      text-align: center;
+      margin: 1.5rem 0;
+      position: relative;
+    }
+    
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: #e5e7eb;
+    }
+    
+    .divider span {
+      background: white;
+      padding: 0 1rem;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
   `]
 })
 export class LoginComponent {
@@ -218,10 +248,46 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
     
-    // For demo purposes, simulate successful login
-    setTimeout(() => {
-      this.loading = false;
-      this.router.navigate(['/dashboard']);
-    }, 1500);
+    console.log('Attempting login with:', this.credentials.email);
+    
+    this.authService.login(this.credentials).subscribe({
+      next: (response) => {
+        console.log('Login successful:', response);
+        this.loading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        console.error('Login failed:', error);
+        console.error('Error status:', error.status);
+        console.error('Error response:', error.error);
+        
+        this.loading = false;
+        
+        // Extract user-friendly error message
+        let errorMessage = 'Login failed. Please try again.';
+        
+        if (error.error && typeof error.error === 'string') {
+          if (error.error.includes('Incorrect password')) {
+            errorMessage = 'Incorrect password. Please try again.';
+          } else if (error.error.includes('User not found with this email address')) {
+            errorMessage = 'No account found with this email address.';
+          } else if (error.error.includes('Invalid email or password')) {
+            errorMessage = 'Invalid email or password. Please check your credentials.';
+          } else if (error.error.includes('Account is locked')) {
+            errorMessage = 'Your account has been locked. Please contact support.';
+          } else if (error.error.includes('Account is disabled')) {
+            errorMessage = 'Your account has been disabled. Please contact support.';
+          } else if (error.error.startsWith('Error: ')) {
+            errorMessage = error.error.substring(7); // Remove 'Error: ' prefix
+          }
+        } else if (error.status === 0) {
+          errorMessage = 'Unable to connect to server. Please check your connection.';
+        } else if (error.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
+        
+        this.error = errorMessage;
+      }
+    });
   }
 }

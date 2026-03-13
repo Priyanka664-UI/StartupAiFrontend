@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -13,8 +13,10 @@ import { AuthService } from '../../services/auth.service';
       <div class="auth-card">
         <div class="auth-header">
           <div class="welcome-robot">🤖</div>
-          <h2>Create Account</h2>
-          <p>Join StartSmart AI today</p>
+          <h2 *ngIf="!isGoogleRegistration">Create Account</h2>
+          <h2 *ngIf="isGoogleRegistration">Complete Google Registration</h2>
+          <p *ngIf="!isGoogleRegistration">Join StartSmart AI today</p>
+          <p *ngIf="isGoogleRegistration">Complete your account setup</p>
         </div>
         
         <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="auth-form">
@@ -38,11 +40,13 @@ import { AuthService } from '../../services/auth.service';
               name="email" 
               placeholder="Enter your email" 
               required
+              [readonly]="isGoogleRegistration"
               class="form-input"
+              [class.readonly]="isGoogleRegistration"
             >
           </div>
           
-          <div class="form-group">
+          <div class="form-group" *ngIf="!isGoogleRegistration">
             <label>Password</label>
             <input 
               type="password" 
@@ -55,8 +59,10 @@ import { AuthService } from '../../services/auth.service';
           </div>
           
           <button type="submit" [disabled]="loading" class="btn-register">
-            <span *ngIf="!loading">Create Account</span>
-            <span *ngIf="loading">Creating Account...</span>
+            <span *ngIf="!loading && !isGoogleRegistration">Create Account</span>
+            <span *ngIf="!loading && isGoogleRegistration">Complete Registration</span>
+            <span *ngIf="loading && !isGoogleRegistration">Creating Account...</span>
+            <span *ngIf="loading && isGoogleRegistration">Completing Registration...</span>
           </button>
         </form>
         
@@ -211,25 +217,89 @@ import { AuthService } from '../../services/auth.service';
       font-size: 0.9rem;
       text-align: center;
     }
+    
+    .readonly {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
   `]
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   userData = { name: '', email: '', password: '' };
   loading = false;
   error = '';
   success = '';
+  isGoogleRegistration = false;
+  googleUserInfo: any = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    // Check if this is a Google registration
+    this.route.queryParams.subscribe(params => {
+      if (params['googleAuth'] === 'true') {
+        this.isGoogleRegistration = true;
+        this.userData.email = params['email'] || '';
+        this.userData.name = params['name'] || '';
+        
+        // Get Google user info from localStorage
+        const googleUserInfo = localStorage.getItem('googleUserInfo');
+        if (googleUserInfo) {
+          this.googleUserInfo = JSON.parse(googleUserInfo);
+        }
+      }
+    });
+  }
 
   onSubmit() {
     this.loading = true;
     this.error = '';
     this.success = '';
     
-    // For demo purposes, simulate successful registration
-    setTimeout(() => {
-      this.success = 'Account created successfully! Redirecting to login...';
-      setTimeout(() => this.router.navigate(['/login']), 2000);
-    }, 1500);
+    if (this.isGoogleRegistration && this.googleUserInfo) {
+      // Register Google user
+      this.authService.googleRegister(
+        this.googleUserInfo.email,
+        this.userData.name || this.googleUserInfo.name,
+        this.googleUserInfo.googleId
+      ).subscribe({
+        next: (response) => {
+          this.loading = false;
+          this.success = 'Google account registered successfully! Redirecting to dashboard...';
+          
+          // Clear stored Google user info
+          localStorage.removeItem('googleUserInfo');
+          
+          setTimeout(() => this.router.navigate(['/dashboard']), 2000);
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Google registration error details:', error);
+          console.error('Error status:', error.status);
+          console.error('Error response:', error.error);
+          this.error = error.error?.message || error.error || 'Google registration failed. Please try again.';
+        }
+      });
+    } else {
+      // Regular registration
+      this.authService.register(this.userData).subscribe({
+        next: (response) => {
+          this.loading = false;
+          this.success = 'Account created successfully! Redirecting to login...';
+          setTimeout(() => this.router.navigate(['/login']), 2000);
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Registration error details:', error);
+          console.error('Error status:', error.status);
+          console.error('Error response:', error.error);
+          this.error = error.error?.message || error.error || 'Registration failed. Please try again.';
+        }
+      });
+    }
   }
 }
